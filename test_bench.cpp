@@ -66,3 +66,34 @@ TEST_CASE( "Bimap can report if a key or value already exists" ) {
         REQUIRE(bm.size() == 0);
     }
 }
+
+TEST_CASE( "Columns can be instanciated" ) {
+    
+    Column c;
+    std::vector<long double> v = {0,1,2,3,4,5};
+    std::string label = "CoLuMn";
+
+    SECTION("EMPTY CONSTRUCTOR") {
+        c = Column();
+    
+        REQUIRE(c.get_label() == "col");
+        REQUIRE(c.get_data().size() == 0);
+        REQUIRE(c.is_masked() == false);
+    }
+
+    SECTION("DATA CONSTRUCTOR") {
+        c = Column(v);
+
+        REQUIRE(c.get_data().size() == v.size());
+        REQUIRE(c.get_label() == "col");
+        REQUIRE(c.is_masked() == false);
+    }
+
+    SECTION("DATA AND LABEL CONSTRUCTOR") {
+        c = Column(v, label);
+
+        REQUIRE(c.get_data().size() == v.size());
+        REQUIRE(c.get_label() == label);
+        REQUIRE(c.is_masked() == false);
+    }
+}
