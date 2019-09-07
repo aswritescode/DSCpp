@@ -3,9 +3,11 @@
 
 #include <string>
 #include <vector>
+
+#include "Bimap.h"
 // #include "util/config.h"
 
-/* Declerations */
+/* Declarations */
 
 // The structure that holds a column of data as well as the other relevent configuration information for the column
 class Column {

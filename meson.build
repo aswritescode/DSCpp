@@ -6,7 +6,4 @@ add_global_arguments('-Wextra', language : 'cpp')
 add_global_arguments('-Wnon-virtual-dtor', language : 'cpp')
 add_global_arguments('-pedantic', language : 'cpp')
 
-
-
-
 executable('t', 'test_bench.cpp')

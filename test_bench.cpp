@@ -32,6 +32,37 @@ TEST_CASE( "Bimap can assign a key-value pair" ) {
 
     REQUIRE( bm.get_value(1) == "one");
     REQUIRE( bm.get_value(2) == "two");
+}
 
+TEST_CASE( "Bimap can report if a key or value already exists" ) {
+    Bimap<long double, string> bm;
 
+    bm.set(1, "one");
+    bm.set(2, "two");
+
+    REQUIRE(bm.has_key(1) == true);
+    REQUIRE(bm.has_value("one") == true);
+
+    REQUIRE(bm.has_key(2) == true);
+    REQUIRE(bm.has_value("two") == true);
+
+    SECTION("REMOVE VIA KEY") {
+        bm.remove_key(1);
+
+        REQUIRE(bm.size() == 1);
+        
+        bm.remove_key(2);
+
+        REQUIRE(bm.size() == 0);
+    }
+
+    SECTION("REMOVE VIA VALUE") {
+        bm.remove_value("one");
+
+        REQUIRE(bm.size() == 1);
+
+        bm.remove_value("two");
+
+        REQUIRE(bm.size() == 0);
+    }
 }
