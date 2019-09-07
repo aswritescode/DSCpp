@@ -16,13 +16,22 @@ TEST_CASE( "Bimap can be instanciated", "[Bimap]" ) {
     REQUIRE( bm.size() == 0);
 
     SECTION ("SAME KEY AND VALUE TYPE") {
-        Bimap<long double, long double> mb_ld_ld;
+        Bimap<long double, long double> bm_ld_ld;
         REQUIRE(bm_ld_ld.size() == 0);
     }
 }
 
 TEST_CASE( "Bimap can assign a key-value pair" ) {
-    Bimap<long double, string>
+    Bimap<long double, string> bm;
+
+    bm.set(1, "one");
+    bm.set(2, "two");
+
+    REQUIRE(bm.get_key("one") == 1);
+    REQUIRE(bm.get_key("two") == 2);
+
+    REQUIRE( bm.get_value(1) == "one");
+    REQUIRE( bm.get_value(2) == "two");
 
 
 }
