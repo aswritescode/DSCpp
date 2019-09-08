@@ -21,7 +21,7 @@ TEST_CASE( "Bimap can be instanciated", "[Bimap]" ) {
     }
 }
 
-TEST_CASE( "Bimap can assign a key-value pair" ) {
+TEST_CASE( "Bimap can assign a key-value pair", "[Bimap]" ) {
     Bimap<long double, string> bm;
 
     bm.set(1, "one");
@@ -34,7 +34,7 @@ TEST_CASE( "Bimap can assign a key-value pair" ) {
     REQUIRE( bm.get_value(2) == "two");
 }
 
-TEST_CASE( "Bimap can report if a key or value already exists" ) {
+TEST_CASE( "Bimap can report if a key or value already exists", "[Bimap]" ) {
     Bimap<long double, string> bm;
 
     bm.set(1, "one");
@@ -67,16 +67,16 @@ TEST_CASE( "Bimap can report if a key or value already exists" ) {
     }
 }
 
-TEST_CASE( "Columns can be instanciated" ) {
+TEST_CASE( "Columns can be instanciated", "[Column]" ) {
     
     Column c;
     std::vector<long double> v = {0,1,2,3,4,5};
     std::string label = "CoLuMn";
 
-    SECTION("EMPTY CONSTRUCTOR") {
+    SECTION("DEFAULT CONSTRUCTOR") {
         c = Column();
     
-        REQUIRE(c.get_label() == "col");
+        REQUIRE(c.get_label() == DEFAULT_LABEL);
         REQUIRE(c.get_data().size() == 0);
         REQUIRE(c.is_masked() == false);
     }
@@ -95,5 +95,44 @@ TEST_CASE( "Columns can be instanciated" ) {
         REQUIRE(c.get_data().size() == v.size());
         REQUIRE(c.get_label() == label);
         REQUIRE(c.is_masked() == false);
+    }
+
+    SECTION("COPY CONSTRUCTOR WITH NO MAP") {
+        Column c2(v, label);
+
+        c = c2;
+
+        REQUIRE(c.get_label() == label);
+        REQUIRE(c.get_data() == v);
+    }
+
+    SECTION("COPY CONSTRUCTOR WITH MAP") {
+        Column c2(v, label);
+        Bimap<long double, std::string> bm;
+        bm.set(1, "one");
+        c2.set_map(bm);
+
+        c = c2;
+
+        REQUIRE(c.get_label() == label);
+        REQUIRE(c.get_data() == v);
+        REQUIRE(c.get_map().size() == 1);
+        REQUIRE(c.get_map().get_value(1) == "one");
+    }
+}
+
+TEST_CASE("Column can have a translation map", "[Column]") {
+    Column c;
+    std::shared_ptr<Bimap<long double, std::string>> bm_ptr = std::make_shared<Bimap<long double, std::string>>();
+    bm_ptr.get()->set(1, "one");
+    bm_ptr.get()->set(2, "two");
+    bm_ptr.get()->set(3, "three");
+
+    SECTION("SET_MAP") {
+        c.set_map(bm_ptr);
+
+        REQUIRE(c.get_map_ptr().get() != nullptr);
+        REQUIRE(c.get_map().get_key("one") == 1);
+        REQUIRE(c.get_map_ptr().get()->get_value(2) == "two");
     }
 }
