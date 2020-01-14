@@ -13,11 +13,11 @@
 
 // The structure that holds a column of data as well as the other relevant configuration information for the column
 class Column {
-    private: 
-        std::string label;
-        bool masked;
-        std::shared_ptr<Bimap<long double, std::string>> translation_map_ptr;
-        std::vector<long double> data;
+    private:
+        std::string label;                                                    // Label that can be used for human identification
+        bool masked;                                                          // Internal variable that tracks whether or not any translated strings reside within the data
+        std::shared_ptr<Bimap<long double, std::string>> translation_map_ptr; // A shared_ptr that points to a Bimap. This allows multiple columns to share a common translation Bimap
+        std::vector<long double> data;                                        // Stores the values present in the column
 
     public:
         // Constructors
@@ -52,7 +52,7 @@ class Column {
 
 class DataSet {
 private:
-    std::vector<std::unique_ptr<Column>> data;                             // A vector of unique_ptrs of columns. This 
+    std::vector<std::unique_ptr<Column>> data;                             // A vector of unique_ptrs of columns. This
     std::shared_ptr< Bimap<long double, std::string>> translation_map_ptr; // A shared_ptr to the Bimap used to store the translation between a string and its hashed value
 
     bool add_term(std::string term); // Attempts to add a value to the Bimap with its auto-generated hash value. Returns true if no previous value exists, false if one does.
@@ -83,7 +83,7 @@ public:
     std::vector<std::vector<std::string>> get_data_as_string(); // Returns a vector of strings instead of lond doubles. All possible values as translated, the rest are just cast to strings.
     void set_data(const std::vector<std::vector<long double>> &data);   // Sets the data of the DataSet from a vector of long double vectors
     void set_data(const std::vector<Column> &data);                     // Sets the data of the DataSet from a vector of Columns. Copies over the Columns' configuration as well (masked, label, etc...)
-    
+
 };
 #endif
 
@@ -116,7 +116,7 @@ Column::Column(std::vector<long double> data) {
 
     translation_map_ptr = std::shared_ptr<Bimap<long double, std::string>>(nullptr);
     this->data = data; // Set the current data to a copy of the passed-in data
-}      
+}
 
 Column::Column(std::vector<long double> data, std::string label) {
     this->label = label;
@@ -137,21 +137,20 @@ std::string Column::as_string(unsigned int index) const {
         throw -1;
     }
 
-    if (translation_map_ptr.get()->has_key( data.at(index) )) { // Check if the key exists
+    if (translation_map_ptr.get()->has_key( data.at(index) )) {        // Check if the key exists
         return translation_map_ptr.get()->get_value( data.at(index) ); // Return the value associated with the key
     } else {
-        return (std::to_string( data.at(index) )); // Returns a string containing the number stored at position 'index' within the vector
+        return (std::to_string( data.at(index) ));                     // Returns a string containing the number stored at position 'index' within the vector
     }
 }
 
+// Returns a vector of strings that contains either the translated value at a given index or the raw value at the index, depending on if a translation is available
 std::vector<std::string> Column::as_string() const {
     std::vector<std::string> vec;
 
-    for (int i = 0; i < this->get_data().size(); i++) {
-        vec.push_back(this->as_string(i));
+    for (int i = 0; i < this->get_data().size(); i++) {   // Iterate over the data contained in the column
+        vec.push_back(this->as_string(i));                // Handle the value at index i using the indivual as_string function
     }
 
     return vec;
 }
-
-
