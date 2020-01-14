@@ -1,15 +1,15 @@
 #include <string>
 #include <vector>
 
-#include "container\DataSet.h"
-#include "container\Bimap.h"
+#include "Container/DataSet.h"
+#include "Container/Bimap.h"
 
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
-#include "testing\catch.hpp"
+#include "testing/catch.hpp"
 
 using namespace std;
 
-TEST_CASE( "Bimap can be instanciated", "[Bimap]" ) {
+TEST_CASE( "Bimap can be instantiated", "[Bimap]" ) {
 
     Bimap<long double, string> bm;
 
@@ -67,7 +67,7 @@ TEST_CASE( "Bimap can report if a key or value already exists", "[Bimap]" ) {
     }
 }
 
-TEST_CASE( "Columns can be instanciated", "[Column]" ) {
+TEST_CASE( "Columns can be instantiated", "[Column]" ) {
     
     Column c;
     std::vector<long double> v = {0,1,2,3,4,5};
@@ -78,7 +78,7 @@ TEST_CASE( "Columns can be instanciated", "[Column]" ) {
     
         REQUIRE(c.get_label() == DEFAULT_LABEL);
         REQUIRE(c.get_data().size() == 0);
-        REQUIRE(c.is_masked() == false);
+        REQUIRE(!c.is_masked());
     }
 
     SECTION("DATA CONSTRUCTOR") {
@@ -86,7 +86,7 @@ TEST_CASE( "Columns can be instanciated", "[Column]" ) {
 
         REQUIRE(c.get_data().size() == v.size());
         REQUIRE(c.get_label() == "col");
-        REQUIRE(c.is_masked() == false);
+        REQUIRE(!c.is_masked());
     }
 
     SECTION("DATA AND LABEL CONSTRUCTOR") {
@@ -94,7 +94,7 @@ TEST_CASE( "Columns can be instanciated", "[Column]" ) {
 
         REQUIRE(c.get_data().size() == v.size());
         REQUIRE(c.get_label() == label);
-        REQUIRE(c.is_masked() == false);
+        REQUIRE(!c.is_masked());
     }
 
     SECTION("COPY CONSTRUCTOR WITH NO MAP") {
@@ -104,6 +104,7 @@ TEST_CASE( "Columns can be instanciated", "[Column]" ) {
 
         REQUIRE(c.get_label() == label);
         REQUIRE(c.get_data() == v);
+        REQUIRE(!c.is_masked());
     }
 
     SECTION("COPY CONSTRUCTOR WITH MAP") {
@@ -113,6 +114,8 @@ TEST_CASE( "Columns can be instanciated", "[Column]" ) {
         c2.set_map(bm);
 
         c = c2;
+
+        c2.set_map(*(new Bimap<long double, std::string>()));
 
         REQUIRE(c.get_label() == label);
         REQUIRE(c.get_data() == v);

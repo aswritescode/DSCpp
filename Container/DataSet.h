@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "Bimap.h"
-#include "..\util\config.h"
+#include "../util/config.h"
 
 /* Declarations */
 
@@ -16,7 +16,7 @@ class Column {
     private: 
         std::string label;
         bool masked;
-        std::shared_ptr<Bimap<long double, std::string>> translation_map_ptr; // Need to implement Bimap
+        std::shared_ptr<Bimap<long double, std::string>> translation_map_ptr;
         std::vector<long double> data;
 
     public:
@@ -24,7 +24,7 @@ class Column {
         Column();                                                 // Basic constructor
         Column(const Column &c);                                  // Copy constructor
         Column(std::vector<long double> data);                    // Data constructor
-        Column(std::vector<long double> data, std::string label); // Data and label constructur
+        Column(std::vector<long double> data, std::string label); // Data and label constructor
 
         // Access functions
         long double& at(unsigned int index) { return data.at(index); }       // Returns a the raw element at position 'index' as a reference.
