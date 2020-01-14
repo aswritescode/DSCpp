@@ -97,6 +97,16 @@ TEST_CASE( "Columns can be instantiated", "[Column]" ) {
         REQUIRE(!c.is_masked());
     }
 
+    SECTION("LABEL CONSTRUCTOR AND SET LABEL WORK THE SAME WAY") {
+        c = Column(v, label);
+
+        Column c1 = Column(v);
+        c1.set_label(label);
+
+        REQUIRE(c1.get_label() == label);
+        REQUIRE(c.get_label() == c1.get_label());
+    }
+
     SECTION("COPY CONSTRUCTOR WITH NO MAP") {
         Column c2(v, label);
 
@@ -115,7 +125,9 @@ TEST_CASE( "Columns can be instantiated", "[Column]" ) {
 
         c = c2;
 
-        c2.set_map(*(new Bimap<long double, std::string>()));
+        Bimap<long double, std::string> bm2;
+
+        c2.set_map(bm2);
 
         REQUIRE(c.get_label() == label);
         REQUIRE(c.get_data() == v);
@@ -137,5 +149,73 @@ TEST_CASE("Column can have a translation map", "[Column]") {
         REQUIRE(c.get_map_ptr().get() != nullptr);
         REQUIRE(c.get_map().get_key("one") == 1);
         REQUIRE(c.get_map_ptr().get()->get_value(2) == "two");
+    }
+}
+
+TEST_CASE("COLUMN CAN BE TURNED INTO STRING, FULL TRANSLATION", "[Column]") {
+    Column c;
+    std::shared_ptr<Bimap<long double, std::string>> bm_ptr = std::make_shared<Bimap<long double, std::string>>();
+    bm_ptr.get()->set(1, "one");
+    bm_ptr.get()->set(2, "two");
+    bm_ptr.get()->set(3, "three");
+
+    std::vector<long double> v = {1, 2, 3, 3, 2, 1};
+
+    c = Column(v);
+    c.set_map(bm_ptr);
+
+    SECTION("AS_STRING INDIVIDUAL") {
+        REQUIRE(c.as_string(0) == "one");
+        REQUIRE(c.as_string(1) == "two");
+        REQUIRE(c.as_string(2) == "three");
+        REQUIRE(c.as_string(3) == "three");
+        REQUIRE(c.as_string(4) == "two");
+        REQUIRE(c.as_string(5) == "one");
+    }
+
+    SECTION("AS_STRING VECTOR"){
+        auto vec = c.as_string();
+
+        REQUIRE(vec.at(0) == "one");
+        REQUIRE(vec.at(1) == "two");
+        REQUIRE(vec.at(2) == "three");
+        REQUIRE(vec.at(3) == "three");
+        REQUIRE(vec.at(4) == "two");
+        REQUIRE(vec.at(5) == "one");
+    }
+}
+
+TEST_CASE("COLUMN CAN BE TURNED INTO STRING, PARTIAL TRANSLATION", "[Column]") {
+    Column c;
+    std::shared_ptr <Bimap<long double, std::string>> bm_ptr = std::make_shared<Bimap<long double, std::string>>();
+    bm_ptr.get()->set(1, "one");
+    bm_ptr.get()->set(2, "two");
+    bm_ptr.get()->set(3, "three");
+
+    std::vector<long double> v = {1, 2, 3, 4, 3, 2, 1};
+
+    c = Column(v);
+    c.set_map(bm_ptr);
+
+    SECTION("AS_STRING INDIVIDUAL") {
+        REQUIRE(c.as_string(0) == "one");
+        REQUIRE(c.as_string(1) == "two");
+        REQUIRE(c.as_string(2) == "three");
+        REQUIRE(c.as_string(3) == "4.000000");
+        REQUIRE(c.as_string(4) == "three");
+        REQUIRE(c.as_string(5) == "two");
+        REQUIRE(c.as_string(6) == "one");
+    }
+
+    SECTION("AS_STRING VECTOR"){
+        auto vec = c.as_string();
+
+        REQUIRE(vec.at(0) == "one");
+        REQUIRE(vec.at(1) == "two");
+        REQUIRE(vec.at(2) == "three");
+        REQUIRE(vec.at(3) == "4.000000");
+        REQUIRE(vec.at(4) == "three");
+        REQUIRE(vec.at(5) == "two");
+        REQUIRE(vec.at(6) == "one");
     }
 }

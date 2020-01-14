@@ -11,7 +11,7 @@
 
 /* Declarations */
 
-// The structure that holds a column of data as well as the other relevent configuration information for the column
+// The structure that holds a column of data as well as the other relevant configuration information for the column
 class Column {
     private: 
         std::string label;
@@ -30,6 +30,7 @@ class Column {
         long double& at(unsigned int index) { return data.at(index); }       // Returns a the raw element at position 'index' as a reference.
         long double at(unsigned int index) const { return data.at(index); }  // Returns a the raw element at position 'index' for const. No reference.
         std::string as_string(unsigned int index) const;                     // Returns, if possible, the string translation of the value at 'index'. This is determined by the Bimap pointer.
+        std::vector<std::string> as_string() const;                          // Returns, a vector of strings containing all translatable values. Any value that doesn't have a translation is simply turned into a string and returned in place.
 
         // Getters and Setters
         bool is_masked() const { return masked; }
@@ -58,8 +59,8 @@ private:
 
 public:
     // Constructors
-    DataSet();                  // Standard constructur 
-    DataSet(const DataSet &ds); // Copy constructur
+    DataSet();                  // Standard constructor
+    DataSet(const DataSet &ds); // Copy constructor
     DataSet(const std::vector<std::vector<long double>> &data);                                  // External data constructor: loads the vector of vectors in and auto-generates labels for the columns
     DataSet(const std::vector<std::vector<long double>> &data, unsigned int axis);                        // External data constructor: loads the vector of vectors in and auto-generates labels for the columns. Axis = 0 means that the vectors are rows, Axis = 1 means that the vectors are columns
     DataSet(const std::vector<std::vector<long double>> &data, std::vector<std::string> labels); // External data constructor: loads the vector of vectors in and uses the labels
@@ -127,13 +128,13 @@ Column::Column(std::vector<long double> data, std::string label) {
 // Returns the de-hashed version of the value at 'index', if possible. If it isn't, a string of the value is returned instead.
 std::string Column::as_string(unsigned int index) const {
     if (translation_map_ptr.get() == nullptr) { // Make sure that the translation map exists
-        if (VERBOSE_ERRORS) std::cout << "[Error] -> as_string() -> No translation map!" << std::endl;
-        throw -1;
+        if (VERBOSE_ERRORS) std::cout << "[Warning] -> as_string() -> No translation map!" << std::endl;
+        return (std::to_string( data.at(index) )); // Returns a string containing the number stored at position 'index' within the vector
     }
 
     if (index >= data.size()) { // Make sure the index is within-bounds
         if (VERBOSE_ERRORS) std::cout << "[Error] -> as_string() -> Index is out of bounds!" << std::endl;
-        throw -2;
+        throw -1;
     }
 
     if (translation_map_ptr.get()->has_key( data.at(index) )) { // Check if the key exists
@@ -141,6 +142,16 @@ std::string Column::as_string(unsigned int index) const {
     } else {
         return (std::to_string( data.at(index) )); // Returns a string containing the number stored at position 'index' within the vector
     }
+}
+
+std::vector<std::string> Column::as_string() const {
+    std::vector<std::string> vec;
+
+    for (int i = 0; i < this->get_data().size(); i++) {
+        vec.push_back(this->as_string(i));
+    }
+
+    return vec;
 }
 
 
