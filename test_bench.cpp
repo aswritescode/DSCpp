@@ -50,7 +50,7 @@ TEST_CASE( "Bimap can report if a key or value already exists", "[Bimap]" ) {
         bm.remove_key(1);
 
         REQUIRE(bm.size() == 1);
-        
+
         bm.remove_key(2);
 
         REQUIRE(bm.size() == 0);
@@ -68,14 +68,14 @@ TEST_CASE( "Bimap can report if a key or value already exists", "[Bimap]" ) {
 }
 
 TEST_CASE( "Columns can be instantiated", "[Column]" ) {
-    
+
     Column c;
     std::vector<long double> v = {0,1,2,3,4,5};
     std::string label = "CoLuMn";
 
     SECTION("DEFAULT CONSTRUCTOR") {
         c = Column();
-    
+
         REQUIRE(c.get_label() == DEFAULT_LABEL);
         REQUIRE(c.get_data().size() == 0);
         REQUIRE(!c.is_masked());
@@ -196,6 +196,9 @@ TEST_CASE("COLUMN CAN BE TURNED INTO STRING, PARTIAL TRANSLATION", "[Column]") {
 
     c = Column(v);
     c.set_map(bm_ptr);
+    c.update_masked();
+
+    REQUIRE(c.is_masked());
 
     SECTION("AS_STRING INDIVIDUAL") {
         REQUIRE(c.as_string(0) == "one");
@@ -218,4 +221,32 @@ TEST_CASE("COLUMN CAN BE TURNED INTO STRING, PARTIAL TRANSLATION", "[Column]") {
         REQUIRE(vec.at(5) == "two");
         REQUIRE(vec.at(6) == "one");
     }
+}
+
+TEST_CASE("COLUMN UPDATES MASKED CORRECTLY") {
+  Column c = Column();
+
+  std::shared_ptr <Bimap<long double, std::string>> bm_ptr = std::make_shared<Bimap<long double, std::string>>();
+
+  SECTION("FALSE FOR NULLPTR") {
+    c.update_masked();
+    REQUIRE(!c.is_masked());
+  }
+
+  SECTION("FALSE FOR EMPTY BIMAP") {
+    c.update_masked();
+    c.set_map(bm_ptr);
+
+    REQUIRE(!c.is_masked());
+  }
+
+  SECTION("TRUE FOR ONE ENTRY IN BIMAP") {
+    (*bm_ptr.get()).set(1, "one");
+
+
+    c.set_map(bm_ptr);
+
+    c.update_masked();
+    REQUIRE(c.is_masked());
+  }
 }
