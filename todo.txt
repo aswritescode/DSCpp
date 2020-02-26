@@ -1,0 +1,5 @@
+Big Picture:
+- Resolve behavioral issue with user vs automatic setting of "bool masked" in DataSet
+
+Little Things:
+- Complete DataSet.h function Definitions.

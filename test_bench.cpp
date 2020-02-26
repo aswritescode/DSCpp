@@ -250,3 +250,25 @@ TEST_CASE("COLUMN UPDATES MASKED CORRECTLY") {
     REQUIRE(c.is_masked());
   }
 }
+
+TEST_CASE("DATASET CAN BE INSTANCIATED") {
+
+  SECTION("WITH THE DEFAULT CONSTRUCTOR") {
+    DataSet ds = DataSet();
+  }
+
+  SECTION("WITH THE COPY CONSTRUCTOR") {
+    DataSet ds0 = DataSet();
+    DataSet ds1 = DataSet(ds0);
+  }
+
+  SECTION("WITH THE DATA CONSTRUCTOR") {
+
+      SECTION("EMPTY DATA") {
+        std::vector<std::vector<long double>> v = { };
+
+        DataSet ds = DataSet(v);
+      }
+
+  }
+}
