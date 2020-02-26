@@ -34,6 +34,20 @@ class Column {
 
         // Getters and Setters
         bool is_masked() const { return masked; }
+        bool update_masked() {
+          if (translation_map_ptr == nullptr) {
+            masked = false;
+            return false;
+          }
+
+          if ((*translation_map_ptr.get()).left().size() < 1) {
+            masked = false;
+            return false;
+          } else {
+            masked = true;
+            return true;
+          }
+         }
         void set_masked(bool b) { masked = b; }
 
         const std::vector<long double>& get_data() const { return data; }
@@ -52,26 +66,26 @@ class Column {
 
 class DataSet {
 private:
-    std::vector<std::unique_ptr<Column>> data;                             // A vector of unique_ptrs of columns. This
-    std::shared_ptr< Bimap<long double, std::string>> translation_map_ptr; // A shared_ptr to the Bimap used to store the translation between a string and its hashed value
-
-    bool add_term(std::string term); // Attempts to add a value to the Bimap with its auto-generated hash value. Returns true if no previous value exists, false if one does.
+    std::vector<std::unique_ptr<Column>> data;                             // A vector of unique_ptrs of columns.
 
 public:
     // Constructors
     DataSet();                  // Standard constructor
     DataSet(const DataSet &ds); // Copy constructor
-    DataSet(const std::vector<std::vector<long double>> &data);                                  // External data constructor: loads the vector of vectors in and auto-generates labels for the columns
-    DataSet(const std::vector<std::vector<long double>> &data, unsigned int axis);                        // External data constructor: loads the vector of vectors in and auto-generates labels for the columns. Axis = 0 means that the vectors are rows, Axis = 1 means that the vectors are columns
-    DataSet(const std::vector<std::vector<long double>> &data, std::vector<std::string> labels); // External data constructor: loads the vector of vectors in and uses the labels
+    DataSet(const std::vector<std::vector<long double>> &data);                                                     // External data constructor: loads the vector of vectors in and auto-generates labels for the columns
+    DataSet(const std::vector<std::vector<long double>> &data, unsigned int axis);                                  // External data constructor: loads the vector of vectors in and auto-generates labels for the columns. Axis = 0 means that the vectors are rows, Axis = 1 means that the vectors are columns
+    DataSet(const std::vector<std::vector<long double>> &data, std::vector<std::string> labels);                    // External data constructor: loads the vector of vectors in and uses the labels
     DataSet(const std::vector<std::vector<long double>> &data, std::vector<std::string> labels, unsigned int axis); // External data constructor: loads the vector of vectors in and uses the labels. Axis = 0 means that the vectors are rows, Axis = 1 means that the vectors are columns
 
     // Access Functions
     std::vector<long double>& at(unsigned int index) const;            // Returns the column at position 'index'
     long double& at(unsigned int index_x, unsigned int index_y) const; // Returns the value at position ('index_x', 'index_y')
 
-    std::vector<long double> get_row(unsigned int index);
-    void set_row(unsigned int index, const std::vector<long double>& row);
+    std::vector<long double> get_row(unsigned int index);                   // Returns a vector of the corresponding row, unmasked
+    void set_row(unsigned int index, const std::vector<long double>& row);  // Sets the values of a given row
+    void set_row(unsigned int index, const std::vector<long double>& row, int default_value);  // Sets the values of a given row.
+                                                                                               // If the row is too small, default_value is inserted such that the
+                                                                                               // row fits
 
     std::vector<long double> get_col(unsigned int index);
     Column get_raw_col(unsigned int index);
@@ -148,9 +162,41 @@ std::string Column::as_string(unsigned int index) const {
 std::vector<std::string> Column::as_string() const {
     std::vector<std::string> vec;
 
-    for (int i = 0; i < this->get_data().size(); i++) {   // Iterate over the data contained in the column
+    for (unsigned int i = 0; i < this->get_data().size(); i++) {   // Iterate over the data contained in the column
         vec.push_back(this->as_string(i));                // Handle the value at index i using the indivual as_string function
     }
 
     return vec;
+}
+
+/* DataSet Definitions */
+DataSet::DataSet() {
+  data = std::vector<std::unique_ptr<Column>>();
+}
+
+ // Copy constructor
+DataSet::DataSet(const DataSet &ds) {
+
+}
+
+// External data constructor: loads the vector of vectors in and auto-generates labels for the columns
+DataSet::DataSet(const std::vector<std::vector<long double>> &data) {
+  for (auto& vec : data) {
+    this->data.push_back(std::unique_ptr<Column> { new Column(vec) });  // For each sub-vector in the data parameter, convert it into a column, add it to a unique_ptr, then push that into
+                                                                        // the current DataSet's private "data" variable
+
+  }
+}
+
+// External data constructor: loads the vector of vectors in and auto-generates labels for the columns. Axis = 0 means that the vectors are rows, Axis = 1 means that the vectors are columns
+DataSet::DataSet(const std::vector<std::vector<long double>> &data, unsigned int axis) {
+
+}
+// External data constructor: loads the vector of vectors in and uses the labels
+DataSet::DataSet(const std::vector<std::vector<long double>> &data, std::vector<std::string> labels) {
+
+}
+ // External data constructor: loads the vector of vectors in and uses the labels. Axis = 0 means that the vectors are rows, Axis = 1 means that the vectors are columns
+DataSet::DataSet(const std::vector<std::vector<long double>> &data, std::vector<std::string> labels, unsigned int axis) {
+
 }
