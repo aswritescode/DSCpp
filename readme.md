@@ -46,6 +46,3 @@ Just drop the headers into your project. Adjust the #include statements as neede
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning.
-## Authors
-
-* **Aaron Sigal** - *Initial work* - [GitHub Account](https://github.com/AaronSigal)
